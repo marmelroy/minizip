@@ -512,7 +512,7 @@ local int zipGoToFirstDisk(zipFile file)
         return err;
     number_disk_next = 0;
     if (zi->number_disk_with_CD > 0)
-        number_disk_next = zi->number_disk_with_CD - 1;
+        number_disk_next = (int)zi->number_disk_with_CD - 1;
     err = zipGoToSpecificDisk(file, number_disk_next, (zi->append == APPEND_STATUS_ADDINZIP));
     if ((err == ZIP_ERRNO) && (zi->append == APPEND_STATUS_ADDINZIP))
         err = zipGoToSpecificDisk(file, number_disk_next, 0);
@@ -536,7 +536,7 @@ local int zipGoToNextDisk(zipFile file)
     if (zi->disk_size == 0)
         return err;
 
-    number_disk_next = zi->number_disk + 1;
+    number_disk_next = (int)zi->number_disk + 1;
 
     do
     {
@@ -1432,7 +1432,7 @@ local int zip64FlushWriteBuffer(zip64_internal* zi)
                 max_write = (uInt)size_available;
         }
 
-        written = ZWRITE64(zi->z_filefunc, zi->filestream, zi->ci.buffered_data + total_written, max_write);
+        written = (unsigned int)ZWRITE64(zi->z_filefunc, zi->filestream, zi->ci.buffered_data + total_written, max_write);
 
         if (ZERROR64(zi->z_filefunc, zi->filestream))
         {
@@ -1794,7 +1794,7 @@ extern int ZEXPORT zipCloseFileInZipRaw64(zipFile file, ZPOS64_T uncompressed_si
 
         /* Local file header is stored on previous disk, switch to make edits */
         if (zi->ci.number_disk != cur_number_disk)
-            err = zipGoToSpecificDisk(file, zi->ci.number_disk, 1);
+            err = zipGoToSpecificDisk(file, (int)zi->ci.number_disk, 1);
 
         if (ZSEEK64(zi->z_filefunc, zi->filestream, zi->ci.pos_local_header + 14, ZLIB_FILEFUNC_SEEK_SET) != 0)
             err = ZIP_ERRNO;
@@ -1827,7 +1827,7 @@ extern int ZEXPORT zipCloseFileInZipRaw64(zipFile file, ZPOS64_T uncompressed_si
 
         /* Now switch back again to the disk we were on before */
         if (zi->ci.number_disk != cur_number_disk)
-            err = zipGoToSpecificDisk(file, cur_number_disk, 1);
+            err = zipGoToSpecificDisk(file, (int)cur_number_disk, 1);
 
         if (ZSEEK64(zi->z_filefunc, zi->filestream, cur_pos_inzip, ZLIB_FILEFUNC_SEEK_SET) != 0)
             err = ZIP_ERRNO;
